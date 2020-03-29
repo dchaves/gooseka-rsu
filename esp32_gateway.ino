@@ -45,8 +45,8 @@ int receive_radio_packet(uint8_t* buffer, int size) {
 
     int packetSize = LoRa.parsePacket();
     if (packetSize == size) {
-        // DEBUG_PRINT("INCOMING LORA ");
-        // DEBUG_PRINTLN(LoRa.packetRssi());
+        DEBUG_PRINT("INCOMING LORA ");
+        DEBUG_PRINTLN(LoRa.packetRssi());
         index = 0;
         while (LoRa.available() && index < size) {
             buffer[index] = LoRa.read();
@@ -83,7 +83,9 @@ void radio_receive_task(void* param) {
         if(millis() - last_sent_millis > LORA_SLOWDOWN) {
             // Send enqueued radio msgs
             xQueueReceive(control_queue, &control, 0);
-            send_via_radio((uint8_t *)&control, sizeof(ESC_control_t));
+            if(control.magic_number == MAGIC_NUMBER) {
+                send_via_radio((uint8_t *)&control, sizeof(ESC_control_t));
+            }
             last_sent_millis = millis();
         }
 

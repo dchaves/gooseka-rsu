@@ -1,7 +1,7 @@
 #ifndef ESP32_CONTROLLER_HELPERS_H
 #define ESP32_CONTROLLER_HELPERS_H
 
-#define ENABLE_DEBUG true // Enable or disable USB Serial console
+#define ENABLE_DEBUG false // Enable or disable USB Serial console
 
 #if ENABLE_DEBUG // Serial printing enabled
 #define DEBUG_BEGIN(BAUDS) Serial.begin(BAUDS)
