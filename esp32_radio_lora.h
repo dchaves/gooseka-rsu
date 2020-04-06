@@ -35,13 +35,10 @@ void send_via_radio(uint8_t* payload, size_t size) {
 }
 
 int receive_radio_packet(uint8_t* buffer, int size) {
-    uint8_t index;
+    uint8_t index = 0;
 
     int packetSize = LoRa.parsePacket();
     if (packetSize == size) {
-        DEBUG_PRINT("INCOMING LORA ");
-        DEBUG_PRINTLN(LoRa.packetRssi());
-        index = 0;
         while (LoRa.available() && index < size) {
             buffer[index] = LoRa.read();
             index++;

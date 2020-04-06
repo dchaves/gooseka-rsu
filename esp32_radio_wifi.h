@@ -25,13 +25,17 @@ void WiFiEvent(WiFiEvent_t event){
             DEBUG_PRINTLN("CLIENT DISCONNECTED");
             break;
         case SYSTEM_EVENT_STA_CONNECTED:
+            DEBUG_PRINTLN("CONNECTED TO AP");
             break;
         case SYSTEM_EVENT_STA_DISCONNECTED:
+            DEBUG_PRINTLN("DISCONNECTED FROM AP");
             break;
     }
 }
 
 void init_radio() {
+    WiFi.disconnect(true);
+    
     // Set event handler
     WiFi.onEvent(WiFiEvent);
 
