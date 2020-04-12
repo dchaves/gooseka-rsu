@@ -1,5 +1,13 @@
-#include <SPI.h>
-#include <LoRa.h>
+// #define USE_WIFI
+
+#ifdef USE_WIFI
+    #include <WiFi.h>
+    #include <WiFiClient.h>
+    #include <WiFiAP.h>
+#else
+    #include <SPI.h>
+    #include <LoRa.h>
+#endif
 
 #include "esp32_controller_defs.h"
 #include "gooseka_structs.h"
@@ -14,6 +22,18 @@
 
 QueueHandle_t control_queue;
 
+#ifdef USE_WIFI
+const char *ssid = "GOOSEKA";
+const char *password = "0D7xoBskQiBXFsPqxGmNwD4UAE3zlEwp";
+
+void init_radio() {
+    
+}
+
+void send_via_radio(uint8_t* payload, size_t size) {}
+int receive_radio_packet(uint8_t* buffer, int size) {}
+int16_t radio_rssi() {}
+#else
 void init_radio() {
     // Set SPI LoRa pins
     SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
@@ -53,13 +73,13 @@ int receive_radio_packet(uint8_t* buffer, int size) {
             index++;
         }
     }
-
     return packetSize;
 }
 
 int16_t radio_rssi() {
     return LoRa.packetRssi();
 }
+#endif
 
 // CPU #1
 void radio_receive_task(void* param) {
