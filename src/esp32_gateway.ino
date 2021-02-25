@@ -84,7 +84,7 @@ int16_t radio_rssi() {
 // CPU #1
 void radio_receive_task(void* param) {
     uint8_t radio_buffer[sizeof(ESC_telemetry_t)];
-    uint8_t index;
+    // uint8_t index;
     ESC_control_t control;
     long last_sent_millis = 0;
 
