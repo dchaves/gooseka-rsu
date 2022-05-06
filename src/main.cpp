@@ -101,13 +101,14 @@ void radio_receive_task(void* param) {
             // Serial.write(radio_rssi());
         }
 
-        if(millis() - last_sent_millis > LORA_SLOWDOWN) {
-            // Send enqueued radio msgs
-            xQueueReceive(control_queue, &control, 0);
-            if(control.magic_number == MAGIC_NUMBER) {
-                send_via_radio((uint8_t *)&control, sizeof(ESC_control_t));
+        if(xQueueReceive(control_queue, &control, 0)) {
+            if(millis() - last_sent_millis > LORA_SLOWDOWN) {
+                // Send enqueued radio msgs
+                if(control.magic_number == MAGIC_NUMBER) {
+                    send_via_radio((uint8_t *)&control, sizeof(ESC_control_t));
+                }
+                last_sent_millis = millis();
             }
-            last_sent_millis = millis();
         }
 
         vTaskDelay(1); // Without this line watchdog resets the board
