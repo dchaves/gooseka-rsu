@@ -1,5 +1,5 @@
-#ifndef ESP32_CONTROLLER_HELPERS_H
-#define ESP32_CONTROLLER_HELPERS_H
+#ifndef GOOSEKA_HELPERS_H
+#define GOOSEKA_HELPERS_H
 
 #define ENABLE_DEBUG false // Enable or disable USB Serial console
 
@@ -13,4 +13,4 @@
 #define DEBUG_PRINT(...) 
 #endif /* ENABLE_DEBUG */
 
-#endif /* ESP32_CONTROLLER_HELPERS_H */
+#endif /* GOOSEKA_HELPERS_H */
