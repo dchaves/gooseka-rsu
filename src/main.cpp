@@ -1,18 +1,10 @@
 // #define USE_WIFI
 #include <Arduino.h>
 
-#ifdef USE_WIFI
-    #include <WiFi.h>
-    #include <WiFiClient.h>
-    #include <WiFiAP.h>
-#else
-    #include <SPI.h>
-    #include <LoRa.h>
-#endif
-
-#include "esp32_controller_defs.h"
+#include "gooseka_defs.h"
 #include "gooseka_structs.h"
-#include "esp32_controller_helpers.h"
+#include "gooseka_helpers.h"
+#include "gooseka_lora.h"
 
 #define STATE_SOF_1 0x00
 #define STATE_SOF_2 0x01
@@ -22,65 +14,6 @@
 #define SOF_2 0xAD
 
 QueueHandle_t control_queue;
-
-#ifdef USE_WIFI
-const char *ssid = "GOOSEKA";
-const char *password = "0D7xoBskQiBXFsPqxGmNwD4UAE3zlEwp";
-
-void init_radio() {
-    
-}
-
-void send_via_radio(uint8_t* payload, size_t size) {}
-int receive_radio_packet(uint8_t* buffer, int size) {}
-int16_t radio_rssi() {}
-#else
-void init_radio() {
-    // Set SPI LoRa pins
-    SPI.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_SS);
-
-    // Setup LoRa transceiver module
-    LoRa.setPins(LORA_SS, LORA_RST, LORA_DIO0);
-    if(!LoRa.begin(LORA_BAND)) {
-        DEBUG_PRINTLN("LoRa initialization error");
-        while(1);
-    }
-
-    LoRa.setCodingRate4(LORA_CODING_RATE);
-    LoRa.setSpreadingFactor(LORA_SPREADING_FACTOR);
-    LoRa.setSignalBandwidth(LORA_BANDWIDTH);
-    LoRa.setTxPower(LORA_TX_POWER);
-    LoRa.setSyncWord(LORA_SYNCWORD);
-}
-
-void send_via_radio(uint8_t* payload, size_t size) {
-    LoRa.beginPacket();
-    LoRa.write(payload, size); 
-    if(LoRa.endPacket() == 1) {
-        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    }
-}
-
-int receive_radio_packet(uint8_t* buffer, int size) {
-    uint8_t index;
-
-    int packetSize = LoRa.parsePacket();
-    if (packetSize == size) {
-        DEBUG_PRINT("INCOMING LORA ");
-        DEBUG_PRINTLN(LoRa.packetRssi());
-        index = 0;
-        while (LoRa.available() && index < size) {
-            buffer[index] = LoRa.read();
-            index++;
-        }
-    }
-    return packetSize;
-}
-
-int16_t radio_rssi() {
-    return LoRa.packetRssi();
-}
-#endif
 
 // CPU #1
 void radio_receive_task(void* param) {
@@ -152,10 +85,12 @@ void USB_receive_task(void* param) {
                     } else {
                         buffer[index] = incomingByte;
                         state = STATE_SOF_1;
+                        // DEBUG_PRINTLN("SENDING");
                         xQueueSend(control_queue, buffer, 0);
                     }
                 break;
                 default:
+                    state = STATE_SOF_1;
                 break;
             }
         }
