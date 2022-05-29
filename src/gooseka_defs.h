@@ -13,7 +13,7 @@
 
 // LORA SENDER SLOW DOWN 
 // (do not send more than one msg every LORA_SLOWDOWN ms)
-#define LORA_SLOWDOWN 50L
+#define LORA_SLOWDOWN 10L
 
 // MAGIC NUMBER TO CHECK FOR USB ERRORS
 #define MAGIC_NUMBER 0xCA
